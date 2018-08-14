@@ -1,0 +1,16 @@
+A parameters:
+--------------
+
+Num. total chromosomes              = 60
+Num. chromosomes truncated          = 10
+Num. elite                          = 1
+Prob. of mutation                   = 0.04
+Prob. of recombination              = 0.3
+
+
+
+-----------------------------------------------
+-	e n d   o f   p a r a m e t e r s         -
+-----------------------------------------------
+
+This is just a check at the end = 999

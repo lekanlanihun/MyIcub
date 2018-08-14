@@ -1,0 +1,4 @@
+Probability Crossover = 0.3
+Probability Mutate    = 0.04
+Number Max Groups     = 60
+Tournament Size       = 15

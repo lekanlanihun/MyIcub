@@ -1,0 +1,181 @@
+#ifdef _GRAPHICS_
+#include "viewer.h"
+
+using namespace std;
+using namespace qglviewer;
+
+Viewer::Viewer(QWidget *parent, Experiment *_exp, int argc, char** argv /*, Video *_video */ )
+    : QGLViewer(QGLFormat(QGL::Rgba),parent)
+    //QGL::SampleBuffers |
+    //QGL::DoubleBuffer |
+    //QGL::DepthBuffer |
+    //QGL::Rgba |
+    //QGL::AlphaChannel |
+    //QGL::StencilBuffer),parent)
+{
+    exp = _exp;
+    //video = _video;
+    glutInit(&argc, argv);
+
+}
+
+
+Viewer::~Viewer()
+{
+    delete[] exp;
+}
+
+void Viewer::init()
+{
+
+    //  resizeGL(200, 200);
+    glClearColor(0.0, 0.0, 0.0, 0.0);
+    //glClearDepth(0.0);
+    glClear(GL_COLOR_BUFFER_BIT );//| GL_DEPTH_BUFFER_BIT );
+    glFlush();
+
+    setGridIsDrawn();
+    setSceneRadius( 300.0 );//300 cm
+    setSceneCenter(Vec(0.0, 0.0, 0.0) );
+    //showEntireScene();
+
+    camera()->setPosition(Vec(0,200,60));
+    //theta rotates the Camera around its Y axis, and then phi rotates it around its X axis.
+    float theta=M_PI, phi=(3.0*M_PI)/2.0;
+    camera()->setOrientation(theta, phi );
+
+    //initialiser le ciel
+    mySky.LoadTexture( SKY_FRONT, "../IMAGES/sky.jpg" );
+    mySky.LoadTexture( SKY_BACK, "../IMAGES/ground.jpg" );
+
+    mySky.LoadTexture( SKY_RIGHT,"../IMAGES/brick.jpg" );
+    mySky.LoadTexture( SKY_LEFT, "../IMAGES/sky.jpg" );
+    mySky.LoadTexture( SKY_TOP, "../IMAGES/sky.jpg" );
+    mySky.LoadTexture( SKY_BOTTOM, "../IMAGES/brick.jpg" );
+
+    /* turn on default lighting */
+    glEnable(GL_LIGHTING);
+    glEnable(GL_LIGHT0);
+    GLfloat ambient[] = { 0.5f, 0.5f, 0.5f };
+    GLfloat diffuse[] = { 0.5f, 0.5f, 0.5f , 0.0f};
+    GLfloat specular[] = { 0.25f, 0.25f, 0.25f , 0.0f};
+    //GLfloat lightcolor[] = { 0.8, 0.8, 0.8 };
+
+    glLightfv(GL_LIGHT0, GL_AMBIENT, ambient);
+    glLightfv(GL_LIGHT0, GL_DIFFUSE, diffuse);
+    glLightfv(GL_LIGHT0, GL_SPECULAR, specular);
+}
+
+void Viewer::draw()
+{
+    GLfloat lightpos[] = { 0.0, 0.0, 7.0, 1.0 };
+    glLightfv(GL_LIGHT0, GL_POSITION, lightpos);
+    
+    glColor3f(0.0, 0.0, 0.0);
+    if (mySky.wantSky())
+      {
+        //mySky.Set( -18.0, -18.0, 0.0, 36.0f );
+        //mySky.Set( -150.0, -150.0, 0.0, 300.0f );
+        //mySky.Render( );
+      }
+    
+    for(int r = 0; r < exp->getNbAgents(); r++ ){
+      exp->getAgent(r)->render( );
+      exp->getCamera()->render( exp->getAgent(r) );
+    }
+    
+    //   glColor3f( exp->getParams()->agent[r]->get_colour()[0],
+    // 	       exp->getParams()->agent[r]->get_colour()[1],
+    // 	       exp->getParams()->agent[r]->get_colour()[2]);
+    //   //exp->getParams()->camera->render( exp->getParams()->agent[r] );
+    // }
+    
+    for(int ob = 0; ob < exp->getNbObjects(); ob++)
+      exp->getObject(ob)->render();
+    
+    glPushMatrix();
+    
+    //Floor patches - Nest
+    for(int obj = 0; obj < exp->getNbObjects(); obj++){
+      glTranslatef(exp->get_floor_target_pos( obj )[0], exp->get_floor_target_pos( obj )[1], 0.03);
+      glColor3f(exp->get_floor_target_colour(obj)[0], 
+		exp->get_floor_target_colour(obj)[1],
+		exp->get_floor_target_colour(obj)[2]);
+      glDrawCircle(0, 0, exp->get_floor_target_dim(obj)[1] );
+      glTranslatef(-exp->get_floor_target_pos( obj )[0], -exp->get_floor_target_pos( obj )[1], -0.03);
+    }
+
+
+    //Arena
+    //glTranslatef(0.0, 0.0, -0.01);
+    //glColor3f(0.8, 0.8, 0.0);
+    //glDrawCircle(0, 0, 135/*75*/);
+
+    // char nest[] = "nest";
+    // glColor3f(1.0, 1.0, 1.0);
+    // glRasterPos3f(10,-70,20);
+    // int len = (int) strlen(nest);
+    // for (int i = 0; i < len; i++){ glutBitmapCharacter( GLUT_BITMAP_HELVETICA_18, nest[i] ); }
+
+    //char forg[] = "foraging site";
+    //glColor3f(1.0, 1.0, 1.0);
+    //glRasterPos3f(10,70,20);
+    //len = (int) strlen(forg);
+    //for (int i = 0; i < len; i++){ glutBitmapCharacter( GLUT_BITMAP_HELVETICA_18, forg[i] ); }
+
+
+    glPopMatrix();
+
+    /*
+    if(video->isRecording())
+    {
+    int nWidth = width();
+    int nHeight = height();
+    pRGB = new unsigned char [4 * (nWidth) * (nHeight)];
+    
+    glReadBuffer( GL_FRONT );
+    glReadPixels(0, 0, nWidth, nHeight, GL_RGBA, GL_UNSIGNED_BYTE, pRGB);
+    
+    video->AddFrame(pRGB);
+    delete pRGB;
+    }
+  */
+}
+
+
+void Viewer::keyPressEvent(QKeyEvent *e)
+{
+#if QT_VERSION < 0x040000
+    if (e->state() == Qt::NoButton)
+#else
+    if (e->modifiers() == Qt::NoModifier)
+#endif
+        switch (e->key())
+        {
+        case Qt::Key_S:         //switch sky
+            mySky.switchSky();
+            updateGL();
+            break;
+        default: QGLViewer::keyPressEvent(e);           //handler de la classe superieure
+        }
+    else
+        QGLViewer::keyPressEvent(e);
+}
+
+void Viewer::glDrawCircle(double x1, double y1, double radius) {
+
+    double x2,y2,angle;
+
+    glBegin(GL_TRIANGLE_FAN);
+    glVertex2f(x1,y1);
+
+    for (angle=1.0f;angle<361.0f;angle+=0.2)
+    {
+        x2 = x1+sin(angle)*radius;
+        y2 = y1+cos(angle)*radius;
+        glVertex2f(x2,y2);
+    }
+
+    glEnd();
+}
+#endif

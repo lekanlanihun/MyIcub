@@ -1,0 +1,42 @@
+cmake_minimum_required(VERSION 2.8)
+
+SET ( EXECUTABLE task_sim )
+
+# UNCOMMENT FOR GRAPHICS
+#add_definitions(-D_GRAPHICS_)
+
+FIND_PACKAGE( Qt COMPONENTS QtOpenGL REQUIRED )
+FIND_PACKAGE( Qt4 REQUIRED )
+SET( QT_USE_QTOPENGL TRUE )
+SET(  QT_USE_QTXML TRUE )
+INCLUDE( ${QT_USE_FILE} )
+
+
+FILE ( GLOB SOURCES ./*.cpp ./MISC/*.cpp ./EVOL_ALGORITHM/*.cpp ./MOEA/*.cpp ./ROB_SENSORS_OBJS/*.cpp ./EXP/*.cpp ./CONTROLLERS/*.cpp ./EXP/RENDERING/*.cpp)  
+FILE ( GLOB HEADERS ./*.h ./MISC/*.h ./EVOL_ALGORITHM/*.h ./MOEA/*.h ./ROB_SENSORS_OBJS/*.cpp ./EXP/*.h ./CONTROLLERS/*.h ./EXP/RENDERING/*.h) 
+FILE ( GLOB UIS ./*.ui ./EXP/RENDERING/*.ui) 
+
+QT4_WRAP_CPP( SOURCES ${HEADERS} )
+QT4_WRAP_UI( SOURCES  ${UIS} )
+FIND_PACKAGE ( GLUT )  
+FIND_PACKAGE ( OpenGL )
+
+INCLUDE_DIRECTORIES( ${OPENGL_INCLUDE_DIR} ${GLUT_INCLUDE_DIR} /usr/include/ /usr/local/include/ ${CMAKE_CURRENT_BINARY_DIR} ./EXP/RENDERING )
+
+# To add c++11 support
+if (MSVC) # MSVC compiler (Win32 only)
+	# Display more warnings
+	SET (CMAKE_CXX_FLAGS "/W3")
+elseif (UNIX OR CMAKE_COMPILER_IS_GNUCXX) # Clang OR Gcc (Linux, Mac OS or Win32 with MingW)
+	# Enable C++11 and displays all warnings
+	SET (CMAKE_CXX_FLAGS "-pthread -lstdc++ -std=c++11")
+	if (APPLE) # Clang / Mac OS only
+		# Required on OSX to compile c++11
+		SET(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -stdlib=libc++ -mmacosx-version-min=10.7")
+	endif(APPLE)
+endif()
+
+ADD_EXECUTABLE( ${EXECUTABLE} ${SOURCES})
+
+TARGET_LINK_LIBRARIES( ${EXECUTABLE}  ${OPENGL_glu_LIBRARY}  ${GLUT_LIBRARIES} -lGL -lGLU  -lGLEW -lOSMesa ${QT_LIBRARIES} )
+TARGET_LINK_LIBRARIES( ${EXECUTABLE} "-L/sw/lib -lgsl -lgslcblas -lm" )

@@ -1,0 +1,53 @@
+INIT RUN parameters 871414 / 3423673 / 2993673
+--------------
+
+Define root_seed                      =  1231414
+
+Number of Evolutionary Generations    = 5000
+Number of Evaluations                 = 48
+Number of Iterations                  = 100
+Number of Agents per group            = 1
+
+Dump statistics every                 = 1
+Dump genome every                     = 1
+
+Choose dir name where to dump data    = ../DATA/
+Choose dir name where to dump genome  = ../GENOME/
+Choose type of controllers            =  ctrnn_three_layers
+(Current Options: simple_three_layers - ctrnn_three_layers - ctrnn_three_layers_hebb - perceptron - elman - ctrnn_fully_recurrent)
+
+Choose type of evolutionary algorithm = roulette_wheel
+(Current Options: roulette_wheel - tournament - swarm_ga - nsga_ii)
+
+Simulation Time Step                  = 0.1
+
+OBJECTS in the WOLRD
+-----------------------------------
+
+Number of bricks       = 0
+Number of cylinders    = 1
+Number of spheres      = 1
+Number of lights       = 0
+
+Number of properties   = 10
+(you need to have at least 10 properties listed below)
+   
+
+LIST OF PROPERTIES    
+1)  x position:           /0.0 /0.0  =0.0 /0.0 /70  /-70 
+2)  y position:           /0.0 /50.0 =30 /90  /0.0 /0.0
+3)  z position:           /2.0 /8.0  =64.685 /8.0 /8   /8
+4)  length:               /8.0 /2.7  =2 /2.7 /2.7 /2.7
+5)  width:                /8.0 /25   =2  /25  /15  /15
+6)  height:               /8.0 /0.0  =2 /0.0 /0.0 /0.0
+7)  rotation on XY plain  /0.0 /0.0  =0.0 /0.0 /0.0 /0.0
+8)  colour R:             /0.0 /1.0  =1.0 /1.0 /1.0 /1.0
+9)  colour G:             /1.0 /0.0  =1.0 /0.0 /1.0 /1.0
+10) colour B:             /1.0 /0.0  =1.0 /0.0 /0.0 /0.0
+
+-----------------------------------------------
+-	e n d   o f   p a r a m e t e r s         -
+-----------------------------------------------
+
+This is just a check at the end = 999
+
